@@ -171,23 +171,8 @@ const SFX = {
 // COLOR CONSTANTS
 // ============================================================
 const COLORS = {
-  steel: '#8a8e94',
-  steelLight: '#b0b5bc',
-  steelDark: '#4a4e54',
-  steelHighlight: '#d4d8de',
-  leather: '#5c3a1e',
-  leatherDark: '#3a2210',
-  chainmail: '#6e7278',
-  tabard: '#8b1a1a',
-  tabardDark: '#5c0e0e',
   gold: '#c9a84c',
   goldDark: '#8a7030',
-  weapon: '#c0c0c0',
-  weaponEdge: '#404040',
-  skin: '#c9a882',
-  skinShadow: '#a07850',
-  cape: '#2a1520',
-  blood: '#660000',
 };
 
 // ============================================================
@@ -238,50 +223,11 @@ const DIFFICULTY_CONFIGS = {
   },
 };
 
-// ============================================================
-// ZONE CONFIGS: 6 attack directions with weapon + transform data
-// ============================================================
-const ZONE_CONFIGS = [
-  { weapon: 'trident',  label: 'Halberd',    torsoRotate: 0,   torsoY: -8,  armAngle: -160, shieldAngle: -20,  leanX: 0,   leanY: -10 },
-  { weapon: 'mace',     label: 'Mace',       torsoRotate: 25,  torsoY: -4,  armAngle: -130, shieldAngle: -50,  leanX: 10,  leanY: -8 },
-  { weapon: 'sword',    label: 'Sword',      torsoRotate: 35,  torsoY: 2,   armAngle: -80,  shieldAngle: -100, leanX: 12,  leanY: 4 },
-  { weapon: 'flail',    label: 'Flail',      torsoRotate: 0,   torsoY: 8,   armAngle: -20,  shieldAngle: -160, leanX: 0,   leanY: 10 },
-  { weapon: 'bow',      label: 'Crossbow',   torsoRotate: -35, torsoY: 2,   armAngle: -100, shieldAngle: -80,  leanX: -12, leanY: 4 },
-  { weapon: 'club',     label: 'Warhammer',  torsoRotate: -25, torsoY: -4,  armAngle: -50,  shieldAngle: -130, leanX: -10, leanY: -8 },
-];
 
 // ============================================================
 // CSS KEYFRAMES (injected via <style>)
 // ============================================================
 const GAME_STYLES = `
-  @keyframes breathe {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(3px); }
-  }
-  @keyframes attackLunge {
-    0% { transform: scale(1) translateY(0); opacity: 0.7; }
-    40% { transform: scale(1.25) translateY(-15px); opacity: 1; }
-    100% { transform: scale(1.1) translateY(-5px); opacity: 0.9; }
-  }
-  @keyframes recoilFlinch {
-    0% { transform: scale(1) translateY(0); }
-    30% { transform: scale(0.8) translateY(20px) rotate(-5deg); }
-    100% { transform: scale(0.95) translateY(10px); }
-  }
-  @keyframes clashShake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-8px); }
-    40% { transform: translateX(8px); }
-    60% { transform: translateX(-5px); }
-    80% { transform: translateX(5px); }
-  }
-  @keyframes missSwing {
-    0% { transform: scale(1) rotate(0deg) translateX(0); opacity: 0.85; }
-    20% { transform: scale(1.1) rotate(-8deg) translateX(10px); opacity: 0.9; }
-    50% { transform: scale(0.85) rotate(18deg) translateX(-15px); opacity: 0.5; }
-    70% { transform: scale(0.9) rotate(-5deg) translateX(8px); opacity: 0.6; }
-    100% { transform: scale(1) rotate(0deg) translateX(0); opacity: 0.85; }
-  }
   @keyframes sparkBurst {
     0% { opacity: 1; transform: scale(0); }
     50% { opacity: 1; transform: scale(1.5); }
@@ -322,343 +268,245 @@ const GAME_STYLES = `
     0% { transform: translateY(0); opacity: 1; }
     100% { transform: translateY(-30px); opacity: 0; }
   }
-  .demon-breathe { animation: breathe 3s ease-in-out infinite; }
-  .demon-attack { animation: attackLunge 0.6s ease-out forwards; }
-  .demon-recoil { animation: recoilFlinch 0.6s ease-out forwards; }
-  .demon-clash { animation: clashShake 0.5s ease-out; }
-  .demon-miss { animation: missSwing 0.8s ease-in-out; }
+
   .screen-shake { animation: screenShake 0.4s ease-out; }
   .spark-effect { animation: sparkBurst 0.6s ease-out forwards; }
   .damage-flash { animation: damageFlash 0.5s ease-out; }
   .slash-anim line { animation: slashLine 0.4s ease-out forwards; stroke-dasharray: 200; }
   .fog-layer { animation: fogDrift 8s ease-in-out infinite; }
   .combo-glow { animation: comboGlow 1s ease-in-out infinite; }
+
+  @keyframes bloodDrop {
+    0% { opacity: 0; transform: scale(0.3) translateY(-10px); }
+    40% { opacity: 0.9; transform: scale(1.2) translateY(0); }
+    100% { opacity: 0; transform: scale(0.8) translateY(20px); }
+  }
+
+  @keyframes windSwish {
+    0% { opacity: 0; transform: translateX(-30px) scaleX(0.5); }
+    30% { opacity: 0.7; transform: translateX(0) scaleX(1); }
+    100% { opacity: 0; transform: translateX(40px) scaleX(0.3); }
+  }
+
+  .vfx-blood { animation: vfxFade 0.8s ease-out forwards; }
+  .vfx-wind { animation: vfxFade 0.6s ease-out forwards; }
+  @keyframes vfxFade {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
 `;
 
 // ============================================================
-// WEAPON SVG COMPONENTS
+// VIDEO ASSET PATHS
 // ============================================================
-const TridentSVG = ({ x, y, rotate, scale = 1 }) => (
-  <g transform={`translate(${x}, ${y}) rotate(${rotate}) scale(${scale})`}>
-    <rect x="-2" y="0" width="4" height="60" fill={COLORS.weapon} rx="1" />
-    <rect x="-2" y="0" width="4" height="60" fill="url(#weaponShine)" rx="1" />
-    {/* Center prong */}
-    <path d="M 0,-25 L -4,-5 L 4,-5 Z" fill={COLORS.weapon} stroke={COLORS.weaponEdge} strokeWidth="0.5" />
-    {/* Left prong */}
-    <path d="M -12,-15 L -8,-5 L -3,-5 Z" fill={COLORS.weapon} stroke={COLORS.weaponEdge} strokeWidth="0.5" />
-    <line x1="-10" y1="-5" x2="-3" y2="-5" stroke={COLORS.weapon} strokeWidth="2" />
-    {/* Right prong */}
-    <path d="M 12,-15 L 8,-5 L 3,-5 Z" fill={COLORS.weapon} stroke={COLORS.weaponEdge} strokeWidth="0.5" />
-    <line x1="10" y1="-5" x2="3" y2="-5" stroke={COLORS.weapon} strokeWidth="2" />
-    {/* Crossbar */}
-    <rect x="-14" y="-6" width="28" height="3" fill={COLORS.goldDark} rx="1" />
-  </g>
-);
-
-const MaceSVG = ({ x, y, rotate, scale = 1 }) => (
-  <g transform={`translate(${x}, ${y}) rotate(${rotate}) scale(${scale})`}>
-    <rect x="-2" y="5" width="4" height="50" fill={COLORS.goldDark} rx="1" />
-    <circle cx="0" cy="0" r="10" fill={COLORS.weapon} stroke={COLORS.weaponEdge} strokeWidth="1" />
-    {/* Spikes */}
-    {[0, 45, 90, 135, 180, 225, 270, 315].map(a => (
-      <line key={a} x1={Math.cos(a * Math.PI / 180) * 8} y1={Math.sin(a * Math.PI / 180) * 8}
-            x2={Math.cos(a * Math.PI / 180) * 14} y2={Math.sin(a * Math.PI / 180) * 14}
-            stroke={COLORS.weapon} strokeWidth="2" strokeLinecap="round" />
-    ))}
-    <circle cx="0" cy="0" r="4" fill={COLORS.goldDark} />
-  </g>
-);
-
-const SwordSVG = ({ x, y, rotate, scale = 1 }) => (
-  <g transform={`translate(${x}, ${y}) rotate(${rotate}) scale(${scale})`}>
-    {/* Blade */}
-    <path d="M 0,-35 L -5,5 L 0,10 L 5,5 Z" fill={COLORS.weapon} stroke={COLORS.weaponEdge} strokeWidth="0.5" />
-    <line x1="0" y1="-30" x2="0" y2="5" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-    {/* Crossguard */}
-    <rect x="-12" y="8" width="24" height="4" fill={COLORS.gold} rx="2" />
-    <circle cx="-12" cy="10" r="2" fill={COLORS.gold} />
-    <circle cx="12" cy="10" r="2" fill={COLORS.gold} />
-    {/* Handle */}
-    <rect x="-2" y="12" width="4" height="18" fill={COLORS.tabard} rx="1" />
-    {/* Pommel */}
-    <circle cx="0" cy="32" r="3" fill={COLORS.gold} />
-  </g>
-);
-
-const FlailSVG = ({ x, y, rotate, scale = 1 }) => (
-  <g transform={`translate(${x}, ${y}) rotate(${rotate}) scale(${scale})`}>
-    {/* Handle */}
-    <rect x="-2" y="10" width="4" height="40" fill={COLORS.leather} rx="1" />
-    <rect x="-2.5" y="12" width="5" height="2" fill={COLORS.gold} rx="0.5" />
-    <rect x="-2.5" y="20" width="5" height="2" fill={COLORS.gold} rx="0.5" />
-    {/* Chain */}
-    {[0, 4, 8, 12].map(i => (
-      <ellipse key={i} cx={Math.sin(i * 0.3) * 2} cy={-i * 2} rx="2" ry="1.5" fill="none" stroke={COLORS.weapon} strokeWidth="1.2" />
-    ))}
-    {/* Spiked ball */}
-    <circle cx="0" cy="-12" r="8" fill={COLORS.steelDark} stroke={COLORS.weapon} strokeWidth="1" />
-    {[0, 45, 90, 135, 180, 225, 270, 315].map(a => (
-      <line key={a} x1={Math.cos(a * Math.PI / 180) * 6 } y1={-12 + Math.sin(a * Math.PI / 180) * 6}
-            x2={Math.cos(a * Math.PI / 180) * 12} y2={-12 + Math.sin(a * Math.PI / 180) * 12}
-            stroke={COLORS.weapon} strokeWidth="1.5" strokeLinecap="round" />
-    ))}
-  </g>
-);
-
-const BowSVG = ({ x, y, rotate, scale = 1 }) => (
-  <g transform={`translate(${x}, ${y}) rotate(${rotate}) scale(${scale})`}>
-    {/* Bow arc */}
-    <path d="M -2,-30 Q -20,0 -2,30" fill="none" stroke={COLORS.goldDark} strokeWidth="3" strokeLinecap="round" />
-    <path d="M -2,-30 Q -18,0 -2,30" fill="none" stroke={COLORS.gold} strokeWidth="1" />
-    {/* Bowstring */}
-    <line x1="-2" y1="-30" x2="-2" y2="30" stroke="#ddd" strokeWidth="0.8" />
-    {/* Arrow */}
-    <line x1="-2" y1="0" x2="35" y2="0" stroke={COLORS.weapon} strokeWidth="1.5" />
-    <path d="M 35,0 L 28,-3 L 28,3 Z" fill={COLORS.weapon} />
-    {/* Fletching */}
-    <path d="M -2,-3 L -8,-6 L -2,0" fill={COLORS.tabard} />
-    <path d="M -2,3 L -8,6 L -2,0" fill={COLORS.tabard} />
-  </g>
-);
-
-const ClubSVG = ({ x, y, rotate, scale = 1 }) => (
-  <g transform={`translate(${x}, ${y}) rotate(${rotate}) scale(${scale})`}>
-    {/* Handle */}
-    <rect x="-2.5" y="10" width="5" height="45" fill={COLORS.goldDark} rx="2" />
-    {/* Club head */}
-    <ellipse cx="0" cy="5" rx="10" ry="14" fill={COLORS.weapon} stroke={COLORS.weaponEdge} strokeWidth="1" />
-    <ellipse cx="0" cy="2" rx="6" ry="8" fill="rgba(255,255,255,0.1)" />
-    {/* Metal bands */}
-    <rect x="-3" y="12" width="6" height="2" fill={COLORS.gold} rx="1" />
-    <rect x="-3" y="20" width="6" height="2" fill={COLORS.gold} rx="1" />
-  </g>
-);
-
-const WEAPON_COMPONENTS = {
-  trident: TridentSVG,
-  mace: MaceSVG,
-  sword: SwordSVG,
-  flail: FlailSVG,
-  bow: BowSVG,
-  club: ClubSVG,
+const KNIGHT_VIDEOS = {
+  idle: '/knight/idle.mp4',
+  attack_left: '/knight/attack_left.mp4',
+  attack_right: '/knight/attack_right.mp4',
+  attack_top: '/knight/attack_top.mp4',
+  block_left: '/knight/block_left.mp4',
+  block_right: '/knight/block_right.mp4',
+  hit: '/knight/hit.mp4',
+  finisher: '/knight/finisher.mp4',
 };
 
+const ATTACK_CLIPS = ['attack_left', 'attack_right', 'attack_top'];
+const BLOCK_CLIPS = ['block_left', 'block_right'];
+
 // ============================================================
-// KNIGHT SVG COMPONENT (Medieval Swordfighter)
+// KNIGHT VIDEO COMPONENT
 // ============================================================
-const KnightSVG = ({ zone = 0, pose = 'idle', visible = true }) => {
+const KnightVideo = ({ pose = 'idle', visible = true, gameOver = false, playerWon = false }) => {
+  const videoRefs = useRef({});
+  const [activeClip, setActiveClip] = useState('idle');
+  const [vfx, setVfx] = useState(null); // 'blood' | 'sparks' | 'wind' | null
+  const prevPoseRef = useRef('idle');
+
+  // Pick a random clip from a list
+  const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+  // Map pose to video clip
+  useEffect(() => {
+    if (!visible) return;
+
+    // Game over takes priority
+    if (gameOver) {
+      if (!playerWon) {
+        // Bot wins — finisher on player
+        setActiveClip('finisher');
+        setVfx(null);
+      } else {
+        // Player wins — bot takes final hit
+        setActiveClip('hit');
+        setVfx('blood');
+        setTimeout(() => setVfx(null), 800);
+      }
+      return;
+    }
+
+    if (pose === prevPoseRef.current && pose === 'idle') return;
+    prevPoseRef.current = pose;
+
+    if (pose === 'attack') {
+      // Bot attacks player — DAMAGE
+      const clip = pickRandom(ATTACK_CLIPS);
+      setActiveClip(clip);
+      setVfx('blood');
+      setTimeout(() => setVfx(null), 800);
+    } else if (pose === 'recoil') {
+      // Player hits bot — HIT
+      setActiveClip('hit');
+      setVfx(null);
+    } else if (pose === 'clash') {
+      // Both correct — CLASH
+      const clip = pickRandom(BLOCK_CLIPS);
+      setActiveClip(clip);
+      setVfx('sparks');
+      setTimeout(() => setVfx(null), 800);
+    } else if (pose === 'miss') {
+      // Both wrong — MISS
+      const clip = pickRandom(ATTACK_CLIPS);
+      setActiveClip(clip);
+      setVfx('wind');
+      setTimeout(() => setVfx(null), 600);
+    } else {
+      setActiveClip('idle');
+      setVfx(null);
+    }
+  }, [pose, visible, gameOver, playerWon]);
+
+  // Play the active clip whenever it changes
+  useEffect(() => {
+    Object.entries(videoRefs.current).forEach(([key, video]) => {
+      if (!video) return;
+      if (key === activeClip) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, [activeClip]);
+
+  // When non-idle clip ends, return to idle
+  const handleEnded = useCallback((clipName) => {
+    if (clipName !== 'idle') {
+      setActiveClip('idle');
+      setVfx(null);
+    }
+  }, []);
+
   if (!visible) return null;
 
-  const config = ZONE_CONFIGS[zone] || ZONE_CONFIGS[0];
-  const WeaponComponent = WEAPON_COMPONENTS[config.weapon];
-
-  const poseClass = pose === 'attack' ? 'demon-attack'
-    : pose === 'recoil' ? 'demon-recoil'
-    : pose === 'clash' ? 'demon-clash'
-    : pose === 'miss' ? 'demon-miss'
-    : 'demon-breathe';
-
-  const attackTransform = pose === 'attack'
-    ? `translate(${config.leanX}, ${config.leanY})`
-    : pose === 'recoil' ? 'translate(0, 8)'
-    : 'translate(0, 0)';
-
   return (
-    <div style={{ position: 'fixed', top: '42%', left: '50%', transform: 'translate(-50%, -50%)', width: '480px', height: '480px', pointerEvents: 'none', zIndex: 1 }}>
-    <svg viewBox="0 0 200 200" className={poseClass}
-         style={{ width: '100%', height: '100%', opacity: 0.85, overflow: 'hidden' }}>
-      <defs>
-        {/* Filters */}
-        <filter id="knightShadow">
-          <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="rgba(0,0,0,0.5)" />
-        </filter>
-        <filter id="metalShine">
-          <feSpecularLighting surfaceScale="3" specularConstant="0.8" specularExponent="25" result="spec">
-            <fePointLight x="120" y="40" z="80" />
-          </feSpecularLighting>
-          <feComposite in="SourceGraphic" in2="spec" operator="arithmetic" k1="0" k2="1" k3="0.15" k4="0" />
-        </filter>
-        <filter id="eyeGlow">
-          <feGaussianBlur stdDeviation="1.5" result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-        {/* Weapon metallic shine */}
-        <linearGradient id="weaponShine" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-          <stop offset="50%" stopColor="rgba(255,255,255,0.2)" />
-          <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-        </linearGradient>
-        {/* Armor gradient */}
-        <linearGradient id="armorGrad" x1="0" y1="0" x2="0.3" y2="1">
-          <stop offset="0%" stopColor={COLORS.steelLight} />
-          <stop offset="40%" stopColor={COLORS.steel} />
-          <stop offset="100%" stopColor={COLORS.steelDark} />
-        </linearGradient>
-        {/* Chainmail pattern */}
-        <pattern id="chainmailPattern" x="0" y="0" width="6" height="5" patternUnits="userSpaceOnUse">
-          <circle cx="1.5" cy="1.5" r="1.8" fill="none" stroke={COLORS.chainmail} strokeWidth="0.4" />
-          <circle cx="4.5" cy="1.5" r="1.8" fill="none" stroke={COLORS.chainmail} strokeWidth="0.4" />
-          <circle cx="3" cy="3.8" r="1.8" fill="none" stroke={COLORS.chainmail} strokeWidth="0.4" />
-          <circle cx="0" cy="3.8" r="1.8" fill="none" stroke={COLORS.chainmail} strokeWidth="0.4" />
-          <circle cx="6" cy="3.8" r="1.8" fill="none" stroke={COLORS.chainmail} strokeWidth="0.4" />
-        </pattern>
-        {/* Dark aura */}
-        <radialGradient id="darkAura" cx="50%" cy="55%" r="50%">
-          <stop offset="0%" stopColor="rgba(10,5,15,0)" />
-          <stop offset="70%" stopColor="rgba(10,5,15,0.2)" />
-          <stop offset="100%" stopColor="rgba(5,0,10,0.4)" />
-        </radialGradient>
-        {/* Tabard gradient */}
-        <linearGradient id="tabardGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={COLORS.tabard} />
-          <stop offset="100%" stopColor={COLORS.tabardDark} />
-        </linearGradient>
-      </defs>
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }}>
+      {/* Video layers — all stacked, only active one visible */}
+      {Object.entries(KNIGHT_VIDEOS).map(([key, src]) => (
+        <video
+          key={key}
+          ref={el => { videoRefs.current[key] = el; }}
+          src={src}
+          muted
+          playsInline
+          preload="auto"
+          loop={key === 'idle'}
+          onEnded={() => handleEnded(key)}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            height: '100%',
+            width: 'auto',
+            objectFit: 'cover',
+            display: activeClip === key ? 'block' : 'none',
+          }}
+        />
+      ))}
 
-      {/* Dark aura */}
-      <circle cx="100" cy="100" r="95" fill="url(#darkAura)" />
+      {/* VFX: Blood Splat */}
+      {vfx === 'blood' && (
+        <div className="vfx-blood" style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          background: 'radial-gradient(ellipse at 50% 40%, rgba(180,0,0,0.6) 0%, rgba(120,0,0,0.3) 30%, transparent 70%)',
+          zIndex: 2,
+        }}>
+          {/* Blood droplets */}
+          {[...Array(8)].map((_, i) => {
+            const x = 30 + Math.random() * 40;
+            const y = 20 + Math.random() * 40;
+            const size = 4 + Math.random() * 12;
+            const delay = Math.random() * 0.2;
+            return (
+              <div key={i} style={{
+                position: 'absolute', left: `${x}%`, top: `${y}%`,
+                width: `${size}px`, height: `${size * 1.3}px`,
+                background: 'radial-gradient(ellipse, #cc0000 30%, #880000 70%, transparent 100%)',
+                borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                opacity: 0, animation: `bloodDrop 0.6s ${delay}s ease-out forwards`,
+              }} />
+            );
+          })}
+        </div>
+      )}
 
-      <g transform={attackTransform} filter="url(#knightShadow)">
-        {/* ---- CAPE (behind body) ---- */}
-        <g transform="translate(100, 105)">
-          <path d="M -25,-12 Q -35,20 -30,60 L 30,60 Q 35,20 25,-12 Z"
-                fill={COLORS.cape} opacity="0.6" />
-          <path d="M -20,-10 Q -28,15 -25,55" fill="none" stroke="rgba(60,30,50,0.3)" strokeWidth="0.5" />
-          <path d="M 20,-10 Q 28,15 25,55" fill="none" stroke="rgba(60,30,50,0.3)" strokeWidth="0.5" />
-        </g>
+      {/* VFX: Clash Sparks */}
+      {vfx === 'sparks' && (
+        <div className="vfx-sparks" style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2,
+        }}>
+          <svg style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%, -50%)', width: '300px', height: '300px' }}
+               viewBox="0 0 200 200" className="spark-effect">
+            <defs>
+              <filter id="sparkGlow2">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+            </defs>
+            <g filter="url(#sparkGlow2)">
+              {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(a => (
+                <line key={a}
+                      x1={100 + Math.cos(a * Math.PI / 180) * 8} y1={100 + Math.sin(a * Math.PI / 180) * 8}
+                      x2={100 + Math.cos(a * Math.PI / 180) * (a % 60 === 0 ? 70 : 45)}
+                      y2={100 + Math.sin(a * Math.PI / 180) * (a % 60 === 0 ? 70 : 45)}
+                      stroke={a % 60 === 0 ? '#ffd700' : '#ffe066'}
+                      strokeWidth={a % 60 === 0 ? '3' : '1.5'}
+                      strokeLinecap="round" opacity={a % 60 === 0 ? 1 : 0.7} />
+              ))}
+              {[15, 75, 135, 195, 255, 315].map(a => (
+                <circle key={a}
+                        cx={100 + Math.cos(a * Math.PI / 180) * 40}
+                        cy={100 + Math.sin(a * Math.PI / 180) * 40}
+                        r="3" fill="#fff" opacity="0.9" />
+              ))}
+              <circle cx="100" cy="100" r="20" fill="rgba(255,215,0,0.5)" />
+              <circle cx="100" cy="100" r="12" fill="rgba(255,240,150,0.7)" />
+              <circle cx="100" cy="100" r="5" fill="rgba(255,255,255,0.9)" />
+            </g>
+          </svg>
+        </div>
+      )}
 
-        {/* ---- TORSO ---- */}
-        <g transform={`translate(100, 105) rotate(${pose === 'attack' ? config.torsoRotate : 0})`}>
-          {/* Chainmail base layer */}
-          <path d="M -30,-16 L -36,32 L 36,32 L 30,-16 Z" fill={COLORS.steelDark} />
-          <rect x="-36" y="-16" width="72" height="48" fill="url(#chainmailPattern)" opacity="0.5" />
-
-          {/* Breastplate */}
-          <path d="M -26,-16 L -30,28 L 30,28 L 26,-16 Z" fill="url(#armorGrad)" stroke={COLORS.steelDark} strokeWidth="0.8" />
-          {/* Breastplate center ridge */}
-          <line x1="0" y1="-14" x2="0" y2="26" stroke={COLORS.steelHighlight} strokeWidth="0.8" opacity="0.5" />
-          {/* Breastplate plate lines */}
-          <path d="M -20,-10 Q -4,2 0,8" fill="none" stroke={COLORS.steelDark} strokeWidth="0.4" opacity="0.5" />
-          <path d="M 20,-10 Q 4,2 0,8" fill="none" stroke={COLORS.steelDark} strokeWidth="0.4" opacity="0.5" />
-
-          {/* Shoulder pauldrons - large plate armor */}
-          <g transform="translate(-32, -10)">
-            <ellipse cx="0" cy="0" rx="10" ry="8" fill="url(#armorGrad)" stroke={COLORS.steelDark} strokeWidth="0.8" />
-            <path d="M -8,0 Q 0,-8 8,0" fill="none" stroke={COLORS.steelHighlight} strokeWidth="0.5" opacity="0.4" />
-            <path d="M -6,3 Q 0,-4 6,3" fill="none" stroke={COLORS.steelHighlight} strokeWidth="0.4" opacity="0.3" />
-            {/* Rivets */}
-            <circle cx="-5" cy="2" r="1" fill={COLORS.goldDark} />
-            <circle cx="5" cy="2" r="1" fill={COLORS.goldDark} />
-          </g>
-          <g transform="translate(32, -10)">
-            <ellipse cx="0" cy="0" rx="10" ry="8" fill="url(#armorGrad)" stroke={COLORS.steelDark} strokeWidth="0.8" />
-            <path d="M -8,0 Q 0,-8 8,0" fill="none" stroke={COLORS.steelHighlight} strokeWidth="0.5" opacity="0.4" />
-            <path d="M -6,3 Q 0,-4 6,3" fill="none" stroke={COLORS.steelHighlight} strokeWidth="0.4" opacity="0.3" />
-            <circle cx="-5" cy="2" r="1" fill={COLORS.goldDark} />
-            <circle cx="5" cy="2" r="1" fill={COLORS.goldDark} />
-          </g>
-
-          {/* Tabard / surcoat over armor */}
-          <path d="M -16,10 L -20,55 L 20,55 L 16,10 Z" fill="url(#tabardGrad)" />
-          {/* Tabard emblem - lion/cross */}
-          <g transform="translate(0, 28)">
-            <line x1="0" y1="-10" x2="0" y2="10" stroke={COLORS.gold} strokeWidth="2" />
-            <line x1="-7" y1="0" x2="7" y2="0" stroke={COLORS.gold} strokeWidth="2" />
-            <circle cx="0" cy="0" r="3" fill="none" stroke={COLORS.gold} strokeWidth="0.8" />
-          </g>
-
-          {/* Belt / fauld */}
-          <rect x="-28" y="26" width="56" height="5" fill={COLORS.leather} stroke={COLORS.leatherDark} strokeWidth="0.5" rx="1" />
-          <rect x="-3" y="25" width="6" height="7" fill={COLORS.gold} stroke={COLORS.goldDark} strokeWidth="0.5" rx="1" />
-
-          {/* ---- RIGHT ARM (weapon arm) ---- */}
-          <g transform={`rotate(${pose === 'attack' ? config.armAngle : -45}, 30, -8)`}>
-            {/* Upper arm - plate armor */}
-            <rect x="28" y="-14" width="9" height="26" fill="url(#armorGrad)" stroke={COLORS.steelDark} strokeWidth="0.5" rx="3" />
-            {/* Elbow cop */}
-            <ellipse cx="32" cy="12" rx="6" ry="4" fill={COLORS.steel} stroke={COLORS.steelDark} strokeWidth="0.5" />
-            {/* Forearm - vambrace */}
-            <rect x="28" y="14" width="9" height="22" fill="url(#armorGrad)" stroke={COLORS.steelDark} strokeWidth="0.5" rx="3" />
-            {/* Gauntlet */}
-            <rect x="27" y="36" width="11" height="8" fill={COLORS.steel} stroke={COLORS.steelDark} strokeWidth="0.5" rx="2" />
-            {/* Gauntlet fingers */}
-            <rect x="28" y="44" width="3" height="4" fill={COLORS.steelDark} rx="1" />
-            <rect x="31.5" y="44" width="3" height="4" fill={COLORS.steelDark} rx="1" />
-            <rect x="35" y="44" width="3" height="3" fill={COLORS.steelDark} rx="1" />
-            {/* Weapon */}
-            <WeaponComponent x={32} y={52} rotate={0} scale={0.55} />
-          </g>
-
-          {/* ---- LEFT ARM (shield arm) ---- */}
-          <g transform={`rotate(${pose === 'attack' ? config.shieldAngle : 45}, -30, -8)`}>
-            {/* Upper arm */}
-            <rect x="-37" y="-14" width="9" height="26" fill="url(#armorGrad)" stroke={COLORS.steelDark} strokeWidth="0.5" rx="3" />
-            {/* Elbow cop */}
-            <ellipse cx="-32" cy="12" rx="6" ry="4" fill={COLORS.steel} stroke={COLORS.steelDark} strokeWidth="0.5" />
-            {/* Forearm */}
-            <rect x="-37" y="14" width="9" height="22" fill="url(#armorGrad)" stroke={COLORS.steelDark} strokeWidth="0.5" rx="3" />
-            {/* Gauntlet */}
-            <rect x="-38" y="36" width="11" height="8" fill={COLORS.steel} stroke={COLORS.steelDark} strokeWidth="0.5" rx="2" />
-            {/* Gauntlet fingers */}
-            <rect x="-37" y="44" width="3" height="4" fill={COLORS.steelDark} rx="1" />
-            <rect x="-33.5" y="44" width="3" height="4" fill={COLORS.steelDark} rx="1" />
-            <rect x="-30" y="44" width="3" height="3" fill={COLORS.steelDark} rx="1" />
-          </g>
-        </g>
-
-        {/* ---- HELMET ---- */}
-        <g transform="translate(100, 62)">
-          {/* Neck - gorget (throat armor) */}
-          <path d="M -10,12 L -12,20 L 12,20 L 10,12 Z" fill={COLORS.steel} stroke={COLORS.steelDark} strokeWidth="0.5" />
-          <line x1="-11" y1="16" x2="11" y2="16" stroke={COLORS.steelDark} strokeWidth="0.3" />
-
-          {/* Chainmail aventail (neck protection hanging from helmet) */}
-          <path d="M -18,4 Q -20,12 -14,18 L 14,18 Q 20,12 18,4" fill={COLORS.steelDark} opacity="0.6" />
-          <rect x="-18" y="4" width="36" height="14" fill="url(#chainmailPattern)" opacity="0.4" />
-
-          {/* Great helm / Bascinet shape */}
-          <path d="M -20,6 Q -22,-8 -18,-18 Q -10,-28 0,-30 Q 10,-28 18,-18 Q 22,-8 20,6 L 16,8 Q 0,10 -16,8 Z"
-                fill="url(#armorGrad)" stroke={COLORS.steelDark} strokeWidth="0.8" />
-
-          {/* Helmet center ridge */}
-          <path d="M 0,-30 Q 1,-15 0,6" fill="none" stroke={COLORS.steelHighlight} strokeWidth="0.8" opacity="0.5" />
-
-          {/* Visor */}
-          <path d="M -16,-2 Q -18,-10 -14,-14 Q 0,-18 14,-14 Q 18,-10 16,-2 Q 0,4 -16,-2 Z"
-                fill={COLORS.steelDark} stroke={COLORS.steelDark} strokeWidth="0.5" />
-
-          {/* Visor breathing holes */}
-          {[-8, -4, 0, 4, 8].map((vx, i) => (
-            <ellipse key={i} cx={vx} cy={-2} rx="0.8" ry="2" fill="#1a1a1a" />
-          ))}
-
-          {/* Eye slit - menacing */}
-          <path d="M -14,-8 L -2,-6 L 0,-7 L 2,-6 L 14,-8" fill="none" stroke="#0a0a0a" strokeWidth="2.5" />
-          {/* Eyes glowing through visor slit */}
-          <g filter="url(#eyeGlow)">
-            <ellipse cx="-8" cy="-7.5" rx="3" ry="1" fill="rgba(200,60,20,0.7)" />
-            <ellipse cx="8" cy="-7.5" rx="3" ry="1" fill="rgba(200,60,20,0.7)" />
-            <ellipse cx="-8" cy="-7.5" rx="1.5" ry="0.5" fill="rgba(255,120,40,0.9)" />
-            <ellipse cx="8" cy="-7.5" rx="1.5" ry="0.5" fill="rgba(255,120,40,0.9)" />
-          </g>
-
-          {/* Helmet edge trim */}
-          <path d="M -16,-2 Q 0,4 16,-2" fill="none" stroke={COLORS.goldDark} strokeWidth="0.8" />
-
-          {/* Helmet crest / plume */}
-          <g transform="translate(0, -28)">
-            <path d="M -2,0 Q -4,-12 -1,-22 Q 2,-14 4,-22 Q 6,-12 2,0 Z"
-                  fill={COLORS.tabard} stroke={COLORS.tabardDark} strokeWidth="0.3" />
-            <path d="M 0,0 Q 1,-10 0,-20" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.3" />
-          </g>
-
-          {/* Scratches and battle damage on helmet */}
-          <line x1="-12" y1="-16" x2="-6" y2="-10" stroke="rgba(80,80,90,0.5)" strokeWidth="0.4" />
-          <line x1="8" y1="-20" x2="14" y2="-12" stroke="rgba(80,80,90,0.4)" strokeWidth="0.3" />
-          <line x1="-5" y1="2" x2="3" y2="5" stroke="rgba(80,80,90,0.3)" strokeWidth="0.3" />
-        </g>
-      </g>
-    </svg>
+      {/* VFX: Miss Wind Swish */}
+      {vfx === 'wind' && (
+        <div className="vfx-wind" style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2,
+        }}>
+          {[...Array(5)].map((_, i) => {
+            const y = 25 + i * 12;
+            const delay = i * 0.08;
+            return (
+              <div key={i} style={{
+                position: 'absolute', left: '20%', top: `${y}%`,
+                width: '60%', height: '2px',
+                background: 'linear-gradient(90deg, transparent, rgba(200,200,255,0.6), rgba(200,200,255,0.3), transparent)',
+                opacity: 0, animation: `windSwish 0.5s ${delay}s ease-out forwards`,
+                borderRadius: '2px',
+              }} />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -808,38 +656,6 @@ const SlashEffect = ({ angle }) => (
   </svg>
 );
 
-// ============================================================
-// SPARK EFFECT COMPONENT (clash)
-// ============================================================
-const SparkEffect = () => (
-  <svg className="spark-effect" viewBox="0 0 200 200" width="420" height="420"
-       style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', pointerEvents: 'none' }}>
-    <defs>
-      <filter id="sparkGlow">
-        <feGaussianBlur stdDeviation="4" result="blur" />
-        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-      </filter>
-    </defs>
-    <g filter="url(#sparkGlow)">
-      {/* Star burst rays */}
-      {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(a => (
-        <line key={a} x1={100 + Math.cos(a * Math.PI / 180) * 8} y1={100 + Math.sin(a * Math.PI / 180) * 8}
-              x2={100 + Math.cos(a * Math.PI / 180) * (a % 60 === 0 ? 60 : 40)} y2={100 + Math.sin(a * Math.PI / 180) * (a % 60 === 0 ? 60 : 40)}
-              stroke={a % 60 === 0 ? '#ffd700' : '#ffe066'} strokeWidth={a % 60 === 0 ? '3' : '1.5'}
-              strokeLinecap="round" opacity={a % 60 === 0 ? 1 : 0.7} />
-      ))}
-      {/* Flying spark particles */}
-      {[15, 75, 135, 195, 255, 315].map(a => (
-        <circle key={a} cx={100 + Math.cos(a * Math.PI / 180) * 35} cy={100 + Math.sin(a * Math.PI / 180) * 35}
-                r="2" fill="#fff" opacity="0.8" />
-      ))}
-      {/* Center flash */}
-      <circle cx="100" cy="100" r="18" fill="rgba(255,215,0,0.5)" />
-      <circle cx="100" cy="100" r="10" fill="rgba(255,240,150,0.7)" />
-      <circle cx="100" cy="100" r="5" fill="rgba(255,255,255,0.9)" />
-    </g>
-  </svg>
-);
 
 // ============================================================
 // DAMAGE OVERLAY COMPONENT (red screen flash)
@@ -856,7 +672,7 @@ const DamageOverlay = ({ active }) => {
 // ORNAMENTAL HEALTH BAR FRAME
 // ============================================================
 const OrnamentalFrame = ({ children, position }) => (
-  <div className={`absolute ${position === 'top' ? 'top-6' : 'bottom-6'} left-1/2 -translate-x-1/2 w-[420px]`}>
+  <div className={`absolute ${position === 'top' ? 'top-6' : 'bottom-6'} left-1/2 -translate-x-1/2 w-[420px]`} style={{ zIndex: 5 }}>
     <div className="relative">
       {/* Gold corner brackets */}
       <svg className="absolute -left-4 -top-2 w-6 h-6" viewBox="0 0 20 20">
@@ -1162,10 +978,6 @@ const MathBattleGame = () => {
   }, [gameState, difficulty]);
 
   // ---- Derived visual state ----
-  const activeZone = swordAnimation
-    ? Math.round(((swordAnimation.angle + 90) % 360) / 60) % 6
-    : 0;
-
   const currentPose = !swordAnimation ? 'idle'
     : swordAnimation.type === 'clash' ? 'clash'
     : swordAnimation.target === 'player' ? 'attack'
@@ -1214,11 +1026,12 @@ const MathBattleGame = () => {
       {/* Battlefield Background */}
       <BattlefieldBackground />
 
-      {/* Knight Illustration Layer - behind radial menu, visible on menu too */}
-      <KnightSVG
-        zone={activeZone}
+      {/* Knight Video Layer - behind radial menu, visible on menu too */}
+      <KnightVideo
         pose={gameState === 'MENU' ? 'idle' : currentPose}
         visible={gameState !== 'IDLE'}
+        gameOver={gameState === 'GAME_OVER'}
+        playerWon={botHP <= 0}
       />
 
       {/* Back to Menu Button */}
@@ -1344,7 +1157,6 @@ const MathBattleGame = () => {
         {swordAnimation?.type === 'attack' && swordAnimation.target === 'bot' && (
           <SlashEffect angle={swordAnimation.angle} />
         )}
-        {swordAnimation?.type === 'clash' && <SparkEffect />}
       </div>
 
       {/* Resolution Message */}
