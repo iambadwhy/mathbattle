@@ -316,33 +316,39 @@ const BLOCK_CLIPS = ['block_left', 'block_right'];
 // ============================================================
 // KNIGHT VIDEO COMPONENT
 // ============================================================
-const KnightVideo = ({ pose = 'idle', visible = true, gameOver = false, playerWon = false }) => {
+const KnightVideo = ({ pose = 'idle', visible = true, playerHP = 100, botHP = 100 }) => {
   const videoRefs = useRef({});
   const [activeClip, setActiveClip] = useState('idle');
   const [vfx, setVfx] = useState(null); // 'blood' | 'sparks' | 'wind' | null
   const prevPoseRef = useRef('idle');
+  const finisherTriggeredRef = useRef(false);
 
   // Pick a random clip from a list
   const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-  // Map pose to video clip
+  // Detect killing blow immediately (before GAME_OVER state)
   useEffect(() => {
-    if (!visible) return;
-
-    // Game over takes priority
-    if (gameOver) {
-      if (!playerWon) {
-        // Bot wins — finisher on player
-        setActiveClip('finisher');
-        setVfx(null);
-      } else {
-        // Player wins — bot takes final hit
-        setActiveClip('hit');
-        setVfx('blood');
-        setTimeout(() => setVfx(null), 800);
-      }
+    if (playerHP > 0 && botHP > 0) {
+      // Game restarted — reset finisher lock
+      finisherTriggeredRef.current = false;
       return;
     }
+    if (finisherTriggeredRef.current) return;
+    if (playerHP <= 0) {
+      finisherTriggeredRef.current = true;
+      setActiveClip('finisher');
+      setVfx(null);
+    } else if (botHP <= 0) {
+      finisherTriggeredRef.current = true;
+      setActiveClip('hit');
+      setVfx('blood');
+      setTimeout(() => setVfx(null), 800);
+    }
+  }, [playerHP, botHP]);
+
+  // Map pose to video clip (skip if finisher is playing)
+  useEffect(() => {
+    if (!visible || finisherTriggeredRef.current) return;
 
     if (pose === prevPoseRef.current && pose === 'idle') return;
     prevPoseRef.current = pose;
@@ -373,7 +379,7 @@ const KnightVideo = ({ pose = 'idle', visible = true, gameOver = false, playerWo
       setActiveClip('idle');
       setVfx(null);
     }
-  }, [pose, visible, gameOver, playerWon]);
+  }, [pose, visible]);
 
   // Play the active clip whenever it changes
   useEffect(() => {
@@ -388,8 +394,9 @@ const KnightVideo = ({ pose = 'idle', visible = true, gameOver = false, playerWo
     });
   }, [activeClip]);
 
-  // When non-idle clip ends, return to idle
+  // When non-idle clip ends, return to idle (unless finisher)
   const handleEnded = useCallback((clipName) => {
+    if (finisherTriggeredRef.current) return; // stay on last frame
     if (clipName !== 'idle') {
       setActiveClip('idle');
       setVfx(null);
@@ -961,12 +968,15 @@ const MathBattleGame = () => {
     }
   }, [playerAnswer, botAnswer]);
 
-  // Check game over
+  // Check game over — delay to let finisher/hit video play first
   useEffect(() => {
     if (playerHP <= 0 || botHP <= 0) {
-      setGameState('GAME_OVER');
-      if (botHP <= 0) SFX.victory();
-      else SFX.gameOver();
+      const delay = 2200; // let the video animation finish (~2s)
+      setTimeout(() => {
+        setGameState('GAME_OVER');
+        if (botHP <= 0) SFX.victory();
+        else SFX.gameOver();
+      }, delay);
     }
   }, [playerHP, botHP]);
 
@@ -1030,8 +1040,8 @@ const MathBattleGame = () => {
       <KnightVideo
         pose={gameState === 'MENU' ? 'idle' : currentPose}
         visible={gameState !== 'IDLE'}
-        gameOver={gameState === 'GAME_OVER'}
-        playerWon={botHP <= 0}
+        playerHP={playerHP}
+        botHP={botHP}
       />
 
       {/* Back to Menu Button */}
