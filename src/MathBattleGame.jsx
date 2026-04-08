@@ -462,7 +462,7 @@ const KnightVideo = ({ pose = 'idle', visible = true, playerHP = 100, botHP = 10
         <div className="vfx-sparks" style={{
           position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2,
         }}>
-          <svg style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%, -50%)', width: '300px', height: '300px' }}
+          <svg style={{ position: 'absolute', top: '30%', left: '30%', transform: 'translate(-50%, -50%)', width: '300px', height: '300px' }}
                viewBox="0 0 200 200" className="spark-effect">
             <defs>
               <filter id="sparkGlow2">
