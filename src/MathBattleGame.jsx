@@ -679,7 +679,7 @@ const DamageOverlay = ({ active }) => {
 // ORNAMENTAL HEALTH BAR FRAME
 // ============================================================
 const OrnamentalFrame = ({ children, position }) => (
-  <div className={`absolute ${position === 'top' ? 'top-6' : 'bottom-6'} left-1/2 -translate-x-1/2 w-[420px]`} style={{ zIndex: 5 }}>
+  <div className={`absolute ${position === 'top' ? 'top-6' : 'bottom-1'} left-1/2 -translate-x-1/2 w-[420px] max-sm:w-[90vw]`} style={{ zIndex: 5 }}>
     <div className="relative">
       {/* Gold corner brackets */}
       <svg className="absolute -left-4 -top-2 w-6 h-6" viewBox="0 0 20 20">
@@ -1096,8 +1096,8 @@ const MathBattleGame = () => {
       )}
 
       {/* Center Radial Menu */}
-      <div className="absolute left-1/2 -translate-x-1/2" style={{ zIndex: 10, top: '52%' }}>
-        <svg width="320" height="320" viewBox="0 0 100 100" className="relative">
+      <div className="absolute left-1/2" style={{ zIndex: 10, bottom: 'max(80px, 12dvh)', transform: 'translateX(-50%)' }}>
+        <svg viewBox="0 0 100 100" className="relative" style={{ width: 'min(320px, 65vw)', height: 'min(320px, 65vw)' }}>
           {/* Semi-transparent backing for readability */}
           <circle cx="50" cy="50" r="49" fill="rgba(0,0,0,0.3)" />
 
@@ -1183,8 +1183,8 @@ const MathBattleGame = () => {
 
       {/* Player Health Bar */}
       <OrnamentalFrame position="bottom">
-        <div className="bg-black/60 backdrop-blur-sm px-5 py-3 rounded-lg border border-[#ffd70033]">
-          <div className="relative h-5 bg-gray-900 rounded-full overflow-hidden border border-[#1a3a1a]">
+        <div className="bg-black/60 backdrop-blur-sm px-5 py-2 max-sm:px-3 max-sm:py-1.5 rounded-lg border border-[#ffd70033]">
+          <div className="relative h-5 max-sm:h-4 bg-gray-900 rounded-full overflow-hidden border border-[#1a3a1a]">
             <div
               className="absolute inset-0 transition-all duration-500 rounded-full"
               style={{
