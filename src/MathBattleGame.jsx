@@ -1030,7 +1030,7 @@ const MathBattleGame = () => {
   };
 
   return (
-    <div className={`w-full h-screen relative overflow-hidden ${screenShake ? 'screen-shake' : ''}`}>
+    <div className={`w-full relative overflow-hidden ${screenShake ? 'screen-shake' : ''}`} style={{ height: '100dvh' }}>
       <style>{GAME_STYLES}</style>
 
       {/* Battlefield Background */}
@@ -1096,8 +1096,8 @@ const MathBattleGame = () => {
       )}
 
       {/* Center Radial Menu */}
-      <div className="absolute left-1/2" style={{ zIndex: 10, bottom: 'max(80px, 12dvh)', transform: 'translateX(-50%)' }}>
-        <svg viewBox="0 0 100 100" className="relative" style={{ width: 'min(320px, 65vw)', height: 'min(320px, 65vw)' }}>
+      <div className="absolute left-1/2" style={{ zIndex: 10, top: '45%', transform: 'translate(-50%, -30%)' }}>
+        <svg viewBox="0 0 100 100" className="relative" style={{ width: 'min(320px, 55vw)', height: 'min(320px, 55vw)' }}>
           {/* Semi-transparent backing for readability */}
           <circle cx="50" cy="50" r="49" fill="rgba(0,0,0,0.3)" />
 
