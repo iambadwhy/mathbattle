@@ -1096,8 +1096,8 @@ const MathBattleGame = () => {
       )}
 
       {/* Center Radial Menu */}
-      <div className="absolute left-1/2" style={{ zIndex: 10, top: '45%', transform: 'translate(-50%, -30%)' }}>
-        <svg viewBox="0 0 100 100" className="relative" style={{ width: 'min(320px, 55vw)', height: 'min(320px, 55vw)' }}>
+      <div className="absolute left-1/2" style={{ zIndex: 10, top: '42%', transform: 'translate(-50%, -30%)' }}>
+        <svg viewBox="0 0 100 100" className="relative" style={{ width: 'min(320px, 72vw)', height: 'min(320px, 72vw)' }}>
           {/* Semi-transparent backing for readability */}
           <circle cx="50" cy="50" r="49" fill="rgba(0,0,0,0.3)" />
 
@@ -1117,7 +1117,7 @@ const MathBattleGame = () => {
                 x={seg.labelX}
                 y={seg.labelY}
                 fill="white"
-                fontSize="7.5"
+                fontSize="9"
                 fontWeight="800"
                 textAnchor="middle"
                 dominantBaseline="middle"
