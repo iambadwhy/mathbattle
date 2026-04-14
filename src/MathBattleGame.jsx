@@ -923,15 +923,10 @@ const MathBattleGame = () => {
           setTimeout(() => SFX.hit(), 100);
         }
         else if (playerCorrect && botCorrect && botAnswerTime < playerAnswerTime) {
-          setResolutionMessage('DAMAGE!');
-          setPlayerHP(prev => Math.max(0, prev - diff.botDamage));
+          setResolutionMessage('BLOCKED!');
           setCombo(0);
-          const botSegmentIndex = answers.findIndex(a => a === botAnswer);
-          const angle = (botSegmentIndex * 60) - 90;
-          setSwordAnimation({ type: 'attack', angle, target: 'player' });
-          setScreenShake(true);
-          SFX.swordSlash();
-          setTimeout(() => SFX.damage(), 100);
+          setSwordAnimation({ type: 'clash', angle: 0 });
+          SFX.clash();
         }
         else if (playerCorrect && !botCorrect) {
           setResolutionMessage('HIT!');
